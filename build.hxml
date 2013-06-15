@@ -1,0 +1,5 @@
+-main utils.UtilsCommands
+-neko haxeutils.n
+#-cpp bin
+-lib mcli
+-D use_rtti_doc
