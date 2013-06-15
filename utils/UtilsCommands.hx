@@ -1,5 +1,10 @@
 package utils;
 
+//import format.tools.CRC32;
+import format.zip.Reader;
+import format.zip.Data;
+import format.zip.Data.Entry;
+import format.zip.Writer;
 import haxe.io.Path;
 import haxe.Json;
 import haxe.xml.Fast;
@@ -60,7 +65,20 @@ class UtilsCommandsMain extends CommandLine
 		d.dispatch(new Xml2Json());
 		//trace("HERE");
 	}
+
+    /**
+		Zip File compress and compress demo
+	**/
+	public function ziptools(d:Dispatch)
+	{
+		//re-dispatch here
+		//trace("git add called");
+		d.dispatch(new ZipUtils());
+		//trace("HERE");
+	}
+    
 }
+
 
 class HaxeUtilsCommand extends CommandLine
 {
@@ -80,6 +98,10 @@ class HaxeUtilsCommand extends CommandLine
         //Sys.println(this.showUsage());
 		Sys.println(this.toString());
 	}
+
+    function isEmpty(s:String):Bool {
+        return (s == null || StringTools.trim(s) == "");
+    }
 }
 
 class Xml2Json extends HaxeUtilsCommand
@@ -103,7 +125,7 @@ class Xml2Json extends HaxeUtilsCommand
        		//trace("running default with " + arg1 + " " + arg2 + " " + varArgs);
         //Sys.println(this.showUsage());
         var xmlfile = inputfile;
-        if (StringTools.trim(xmlfile) != "") {
+        if (!isEmpty(xmlfile)) {
             //File.
             if (FileSystem.exists(xmlfile)) {
                 var data = File.getContent(xmlfile);
@@ -187,3 +209,52 @@ class Xml2Json extends HaxeUtilsCommand
 		//Sys.println(this.showUsage());
 	//}    
 //}
+
+class ZipUtils extends HaxeUtilsCommand
+{
+    /**
+		input file or folder
+        @alias i
+	**/    
+    public var input:String = "";    
+    
+    /**
+		compress zip file
+        @alias c
+	**/    
+    public var compress:Bool = false;
+    
+    /**
+		uncompress zip file
+        @alias d
+	**/    
+    public var decompress:Bool = false;
+    
+    private function _compress():Void {
+        trace("wait.....todo compress function!");
+        if (isEmpty(input)) return;
+    }
+    
+    private function _decompress():Void {
+        //trace("wait.....todo decompress function!");
+        if (isEmpty(input)) return;
+        if (FileSystem.exists(input)) {
+            if (Path.extension(input.toLowerCase()) == "zip") {
+                var zip:List<Entry> = ZipTools.getEntries(input);
+                //ZipTools.listEntries(zip);
+                for(items in zip ) {
+                    var content = items.data;
+                    Sys.println("- " + items.fileName + ": " + items.compressed + ':' + content.length);
+                    trace(content);
+                }
+            }
+        }
+    }
+    
+    public function runDefault()
+	{
+        if (compress) this._compress();
+        else if (decompress) this._decompress();
+        else help();
+	}
+}
